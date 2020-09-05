@@ -1,11 +1,19 @@
 import React from 'react';
 import {StatusBar, View, Text, Image, TouchableOpacity} from 'react-native';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
+import { createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
+import OrderDetainScreen from './src/Screens/OrderDetainScreen';
 
 // Tabs Screens
 import New from './src/Screens/New';
+import Pending from './src/Screens/Pending';
+import Compeleted from './src/Screens/Compeleted';
 
 class App extends React.Component {
+  static navigationOptions = {
+    headerShown: false
+  }
   constructor(props) {
     super(props);
     this.state = {
@@ -24,7 +32,14 @@ class App extends React.Component {
     var renderScene = ({route}) => {
       switch (route.key) {
         case 'New':
-          return <New />;
+          return <New navigation={this.props.navigation} />;
+        
+        case "Pending":
+          return <Pending />
+        
+          case "Complete":
+            return <Compeleted />
+
       }
     };
 
@@ -101,43 +116,12 @@ class App extends React.Component {
   }
 }
 
-// const styles = StyleSheet.create({
-//   scrollView: {
-//     backgroundColor: Colors.lighter,
-//   },
-//   engine: {
-//     position: 'absolute',
-//     right: 0,
-//   },
-//   body: {
-//     backgroundColor: Colors.white,
-//   },
-//   sectionContainer: {
-//     marginTop: 32,
-//     paddingHorizontal: 24,
-//   },
-//   sectionTitle: {
-//     fontSize: 24,
-//     fontWeight: '600',
-//     color: Colors.black,
-//   },
-//   sectionDescription: {
-//     marginTop: 8,
-//     fontSize: 18,
-//     fontWeight: '400',
-//     color: Colors.dark,
-//   },
-//   highlight: {
-//     fontWeight: '700',
-//   },
-//   footer: {
-//     color: Colors.dark,
-//     fontSize: 12,
-//     fontWeight: '600',
-//     padding: 4,
-//     paddingRight: 12,
-//     textAlign: 'right',
-//   },
-// });
+const HomeStack = createStackNavigator(
+  {
+  App: App,
+  DetainScreen: OrderDetainScreen
 
-export default App;
+})
+
+const AppContainer = createAppContainer(HomeStack)
+export default (AppContainer);
