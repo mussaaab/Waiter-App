@@ -19,9 +19,9 @@ class App extends React.Component {
     this.state = {
       index: 0,
       routes: [
-        {key: 'New', title: 'New (11)'},
-        {key: 'Pending', title: 'Pending (1)'},
-        {key: 'Complete', title: 'Completed (2)'},
+        {key: 'New', title: 'New'},
+        {key: 'Pending', title: 'Pending'},
+        {key: 'Complete', title: 'Completed'},
       ],
     };
   }
