@@ -1,8 +1,8 @@
 import React from 'react';
 import {StatusBar, View, Text, Image, TouchableOpacity} from 'react-native';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
-import { createAppContainer } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import {createAppContainer} from 'react-navigation';
+import {createStackNavigator} from 'react-navigation-stack';
 import OrderDetainScreen from './src/Screens/OrderDetainScreen';
 
 // Tabs Screens
@@ -12,8 +12,8 @@ import Compeleted from './src/Screens/Compeleted';
 
 class App extends React.Component {
   static navigationOptions = {
-    headerShown: false
-  }
+    headerShown: false,
+  };
   constructor(props) {
     super(props);
     this.state = {
@@ -26,20 +26,43 @@ class App extends React.Component {
     };
   }
 
+  refresh = () => {
+    this.New.refresh();
+    this.Pending.refresh();
+    this.Compeleted.refresh();
+  };
+
   render() {
     const {index, routes} = this.state;
 
     var renderScene = ({route}) => {
       switch (route.key) {
         case 'New':
-          return <New navigation={this.props.navigation} />;
-        
-        case "Pending":
-          return <Pending />
-        
-          case "Complete":
-            return <Compeleted />
+          return (
+            <New
+              ref={(component) => (this.New = component)}
+              callback={(callback) => this.callback(callback)}
+              navigation={this.props.navigation}
+            />
+          );
 
+        case 'Pending':
+          return (
+            <Pending
+              ref={(component) => (this.Pending = component)}
+              callback={(callback) => this.callback(callback)}
+              navigation={this.props.navigation}
+            />
+          );
+
+        case 'Complete':
+          return (
+            <Compeleted
+              ref={(component) => (this.Compeleted = component)}
+              callback={(callback) => this.callback(callback)}
+              navigation={this.props.navigation}
+            />
+          );
       }
     };
 
@@ -62,6 +85,7 @@ class App extends React.Component {
 
           <View style={{flex: 1, flexDirection: 'row'}}>
             <TouchableOpacity
+              onPress={this.refresh}
               style={{
                 flex: 1,
                 alignItems: 'center',
@@ -105,9 +129,9 @@ class App extends React.Component {
             <TabBar
               {...props}
               indicatorStyle={{backgroundColor: '#ffbe26', height: 5}}
-              style={{backgroundColor: '#2e2e2e',}}
+              style={{backgroundColor: '#2e2e2e'}}
               labelStyle={{fontSize: 12}}
-              tabStyle={{borderRightWidth: 1, borderRightColor: "gray", }}
+              tabStyle={{borderRightWidth: 1, borderRightColor: 'gray'}}
             />
           )}
         />
@@ -116,12 +140,10 @@ class App extends React.Component {
   }
 }
 
-const HomeStack = createStackNavigator(
-  {
+const HomeStack = createStackNavigator({
   App: App,
-  DetainScreen: OrderDetainScreen
+  DetainScreen: OrderDetainScreen,
+});
 
-})
-
-const AppContainer = createAppContainer(HomeStack)
-export default (AppContainer);
+const AppContainer = createAppContainer(HomeStack);
+export default AppContainer;

@@ -13,15 +13,18 @@ class New extends Component {
     super(props);
     this.state = {
       food_data: [],
-      totalPrice: '',
       loading: false,
+      refreshing: false,
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     this.setState({loading: true});
+    this.getData();
+  }
 
-    await fetch('https://vivekchand19-eval-test.apigee.net/fooapp/v1/orders', {
+  getData = async () => {
+    fetch('https://vivekchand19-eval-test.apigee.net/fooapp/v1/orders', {
       method: 'GET',
     })
       .then((res) => {
@@ -34,9 +37,21 @@ class New extends Component {
             array.push(value);
           }
         });
-        this.setState({food_data: array, loading: false});
+        this.setState({food_data: array, loading: false, refreshing: false});
       });
-  }
+  };
+
+  refresh = () => {
+    this.setState(
+      {
+        refreshing: true,
+        food_data: [],
+      },
+      () => {
+        this.getData();
+      },
+    );
+  };
 
   render() {
     const {loading} = this.state;
@@ -51,6 +66,8 @@ class New extends Component {
     return (
       <View style={{flex: 1}}>
         <FlatList
+          refreshing={this.state.refreshing}
+          onRefresh={this.refresh}
           style={{flex: 1}}
           data={this.state.food_data}
           showsVerticalScrollIndicator={false}
@@ -62,7 +79,6 @@ class New extends Component {
                     data: item,
                   })
                 }
-                // key={`${item.key}`}
                 style={{
                   borderBottomWidth: 1,
                   borderBottomColor: '#d1d1d1',

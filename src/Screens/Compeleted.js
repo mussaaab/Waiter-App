@@ -1,17 +1,27 @@
 import React, {Component} from 'react';
-import {View, Text, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 
 class Compeleted extends Component {
   constructor(props) {
     super(props);
     this.state = {
       completed_Orders: [],
+      refreshing: false
     };
   }
 
   async componentDidMount() {
     this.setState({loading: true});
+    this.getData();
+  }
 
+  getData = async () => {
     await fetch('https://vivekchand19-eval-test.apigee.net/fooapp/v1/orders', {
       method: 'GET',
     })
@@ -25,18 +35,49 @@ class Compeleted extends Component {
             array.push(value);
           }
         });
-        this.setState({completed_Orders: array, loading: false});
+        this.setState({
+          completed_Orders: array,
+          loading: false,
+          refreshing: false,
+        });
       });
-  }
+  };
+
+  refresh = () => {
+    this.setState(
+      {
+        refreshing: true,
+        pending_Orders: [],
+      },
+      () => {
+        this.getData();
+      },
+    );
+  };
 
   render() {
+    const {loading} = this.state;
+    if (loading) {
+      return (
+        <View style={{flex: 1, justifyContent: 'center'}}>
+          <ActivityIndicator size="large" color="#ffbe26" />
+        </View>
+      );
+    }
     return (
       <View style={{flex: 1}}>
         <FlatList
+          refreshing={this.state.refreshing}
+          onRefresh={this.refresh}
           data={this.state.completed_Orders}
           renderItem={({item}) => {
             return (
-              <View
+              <TouchableOpacity
+                onPress={() =>
+                  this.props.navigation.navigate('DetainScreen', {
+                    data: item,
+                  })
+                }
                 style={{
                   borderBottomWidth: 1,
                   borderBottomColor: '#d1d1d1',
@@ -90,7 +131,7 @@ class Compeleted extends Component {
                   </Text>
 
                   <View style={{flex: 1, marginTop: 5, flexDirection: 'row'}}>
-                  <Text style={{color: 'green', fontWeight: 'bold'}}>
+                    <Text style={{color: 'green', fontWeight: 'bold'}}>
                       {item.flags.handle_and_complete + ' '}
                       <Text style={{fontWeight: 'bold', color: '#8f8f8f'}}>
                         SUCCESS
@@ -121,11 +162,10 @@ class Compeleted extends Component {
                           {item.status}
                         </Text>
                       </Text>
-                      
                     </View>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }}
         />

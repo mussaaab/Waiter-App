@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {Text, View, TouchableOpacity, Image, Modal} from 'react-native';
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Modal,
+  FlatList,
+} from 'react-native';
 
 export class OrderDetainScreen extends Component {
   static navigationOptions = {
@@ -8,6 +15,7 @@ export class OrderDetainScreen extends Component {
 
   state = {
     modalVisible: false,
+    order_data: this.props.navigation.getParam('data'),
   };
 
   modal = ({visible}) => {
@@ -35,12 +43,11 @@ export class OrderDetainScreen extends Component {
         if (res.success == 1) {
           alert(res.message);
         }
-        this.setState({modalVisible: false})
+        this.setState({modalVisible: false});
       });
   };
 
   render() {
-    const orderData = this.props.navigation.getParam('data');
     return (
       <View style={{flex: 1}}>
         <View
@@ -94,9 +101,7 @@ export class OrderDetainScreen extends Component {
               source={require('../Assets/marker.png')}
               style={{width: 30, height: 30, resizeMode: 'contain'}}
             />
-            <Text style={{paddingTop: 10, fontWeight: 'bold'}}>
-                34
-            </Text>
+            <Text style={{paddingTop: 10, fontWeight: 'bold'}}>34</Text>
           </View>
 
           <View
@@ -107,7 +112,7 @@ export class OrderDetainScreen extends Component {
               style={{width: 30, height: 30, resizeMode: 'contain'}}
             />
             <Text style={{paddingTop: 10, fontWeight: 'bold', color: ''}}>
-              {orderData.total_price}
+              {this.state.order_data.total_price}
             </Text>
           </View>
 
@@ -118,71 +123,45 @@ export class OrderDetainScreen extends Component {
               source={require('../Assets/clock.png')}
               style={{width: 30, height: 30, resizeMode: 'contain'}}
             />
-            <Text style={{paddingTop: 10, fontWeight: 'bold'}}>
-              9 min
-            </Text>
+            <Text style={{paddingTop: 10, fontWeight: 'bold'}}>9 min</Text>
           </View>
         </View>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            padding: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: 'gray',
-            backgroundColor: '#e7e7e7',
-          }}>
-          <Text>{orderData.items[0].qty}</Text>
+        <FlatList
+          data={this.state.order_data['items']}
+          renderItem={({item}) => {
+            return (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  padding: 10,
+                  borderBottomWidth: 1,
+                  borderBottomColor: 'gray',
+                  backgroundColor: '#e7e7e7',
+                }}>
+                <Text>{item.qty}</Text>
 
-          <Text style={{paddingLeft: 10, fontWeight: 'bold', color: '#ffbe26'}}>
-            X
-          </Text>
-          <Text style={{paddingLeft: 10}}>{orderData.items[0].name}</Text>
-          <View style={{flex: 1, alignItems: 'flex-end'}}>
-            <Text>{orderData.items[0].price}</Text>
-          </View>
-        </View>
+                <Text
+                  style={{
+                    paddingLeft: 10,
+                    fontWeight: 'bold',
+                    color: '#ffbe26',
+                  }}>
+                  X
+                </Text>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            padding: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: 'gray',
-            backgroundColor: '#e7e7e7',
-          }}>
-          <Text>{orderData.items[1].qty}</Text>
-          <Text style={{paddingLeft: 10, fontWeight: 'bold', color: '#ffbe26'}}>
-            X
-          </Text>
-          <Text style={{paddingLeft: 10}}>{orderData.items[1].name}</Text>
-          <View style={{flex: 1, alignItems: 'flex-end'}}>
-            <Text>{orderData.items[1].price}</Text>
-          </View>
-        </View>
+                <Text style={{paddingLeft: 10}}>{item.name}</Text>
+                <View style={{flex: 1, alignItems: 'flex-end'}}>
+                  <Text>{item.price}</Text>
+                </View>
+              </View>
+            );
+          }}
+        />
 
         <View
           style={{
-            flexDirection: 'row',
-            padding: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: 'gray',
-            backgroundColor: '#e7e7e7',
-          }}>
-          <Text>{orderData.items[2].qty}</Text>
-          <Text style={{paddingLeft: 10, fontWeight: 'bold', color: '#ffbe26'}}>
-            X
-          </Text>
-          <Text style={{paddingLeft: 10}}>{orderData.items[2].name}</Text>
-          <View style={{flex: 1, alignItems: 'flex-end'}}>
-            <Text>{orderData.items[2].price}</Text>
-          </View>
-        </View>
-
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: '#C2C2C2',
+            backgroundColor: '#e8e8e8',
             justifyContent: 'flex-end',
           }}>
           <View
@@ -194,14 +173,14 @@ export class OrderDetainScreen extends Component {
             <View style={{alignSelf: 'center', width: '90%'}}>
               <View style={{marginTop: 5, flexDirection: 'row'}}>
                 <Text style={{color: 'green', fontWeight: 'bold'}}>
-                  {orderData.flags.handle_and_complete + ' '}
+                  {this.state.order_data.flags.handle_and_complete + ' '}
                   <Text style={{fontWeight: 'bold', color: '#8f8f8f'}}>
                     SUCCESS
                   </Text>
                 </Text>
                 <Text
                   style={{color: 'red', fontWeight: 'bold', paddingLeft: 10}}>
-                  {orderData.flags.abuse + ' '}
+                  {this.state.order_data.flags.abuse + ' '}
                   <Text style={{fontWeight: 'bold', color: '#8f8f8f'}}>
                     ABUSE
                   </Text>
@@ -219,7 +198,7 @@ export class OrderDetainScreen extends Component {
               justifyContent: 'space-between',
             }}>
             <TouchableOpacity
-            onPress={() => this.props.navigation.goBack()}
+              onPress={() => this.props.navigation.goBack()}
               style={{
                 width: '29%',
                 height: '100%',
@@ -272,7 +251,9 @@ export class OrderDetainScreen extends Component {
                 justifyContent: 'space-between',
               }}>
               <TouchableOpacity
-                onPress={() => {this.Button_handler("handle_and_complete")}}
+                onPress={() => {
+                  this.Button_handler('handle_and_complete');
+                }}
                 style={{
                   width: '95%',
                   height: 60,
@@ -290,7 +271,9 @@ export class OrderDetainScreen extends Component {
               </TouchableOpacity>
 
               <TouchableOpacity
-               onPress={ () => {this.Button_handler("handle") }}
+                onPress={() => {
+                  this.Button_handler('handle');
+                }}
                 style={{
                   width: '95%',
                   height: 60,
@@ -308,7 +291,9 @@ export class OrderDetainScreen extends Component {
               </TouchableOpacity>
 
               <TouchableOpacity
-               onPress={() => {this.Button_handler("dismiss")}}
+                onPress={() => {
+                  this.Button_handler('dismiss');
+                }}
                 style={{
                   width: '95%',
                   height: 60,
@@ -326,7 +311,9 @@ export class OrderDetainScreen extends Component {
               </TouchableOpacity>
 
               <TouchableOpacity
-               onPress={() => {this.Button_handler("abuse")}}
+                onPress={() => {
+                  this.Button_handler('abuse');
+                }}
                 style={{
                   width: '95%',
                   height: 60,

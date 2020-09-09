@@ -1,20 +1,24 @@
 import React, {Component} from 'react';
-import {View, Text, FlatList} from 'react-native';
+import {View, Text, FlatList, ActivityIndicator} from 'react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 class Pending extends Component {
   constructor(props) {
     super(props);
     this.state = {
       pending_Orders: [],
-      totalPrice: '',
+      refreshing: false,
       loading: false,
     };
   }
 
   async componentDidMount() {
     this.setState({loading: true});
+    this.getData();
+  }
 
-    await fetch('https://vivekchand19-eval-test.apigee.net/fooapp/v1/orders', {
+  getData = () => {
+    fetch('https://vivekchand19-eval-test.apigee.net/fooapp/v1/orders', {
       method: 'GET',
     })
       .then((res) => {
@@ -27,18 +31,45 @@ class Pending extends Component {
             array.push(value);
           }
         });
-        this.setState({pending_Orders: array, loading: false});
+        this.setState({pending_Orders: array, loading: false, refreshing: false});
       });
-  }
+  };
+
+  refresh = () => {
+    this.setState(
+      {
+        refreshing: true,
+        pending_Orders: [],
+      },
+      () => {
+        this.getData();
+      },
+    );
+  };
 
   render() {
+    const {loading} = this.state;
+    if (loading) {
+      return (
+        <View style={{flex: 1, justifyContent: 'center'}}>
+          <ActivityIndicator size="large" color="#ffbe26" />
+        </View>
+      );
+    }
     return (
       <View style={{flex: 1}}>
         <FlatList
+          refreshing={this.state.refreshing}
+          onRefresh={this.refresh}
           data={this.state.pending_Orders}
           renderItem={({item}) => {
             return (
-              <View
+              <TouchableOpacity
+                onPress={() =>
+                  this.props.navigation.navigate('DetainScreen', {
+                    data: item,
+                  })
+                }
                 style={{
                   borderBottomWidth: 1,
                   borderBottomColor: '#d1d1d1',
@@ -110,10 +141,9 @@ class Pending extends Component {
                         ABUSE
                       </Text>
                     </Text>
-                    
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }}
         />
